@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+//import "./IPManagement.sol";
+
 contract RoyaltyDistribution {
+    //CreateIPNFT public _createIPNFT;
+
     struct RoyaltyShare {
         address payable recipient;
         uint256 percentage;
@@ -10,6 +14,10 @@ contract RoyaltyDistribution {
     mapping(uint256 => RoyaltyShare[]) public royaltyShares;
 
     event RoyaltiesDistributed(uint256 indexed tokenId, uint256 totalAmount);
+
+    //constructor(address createIPNFT) {
+    //    _createIPNFT = CreateIPNFT(createIPNFT);
+    //}
 
     function setRoyaltyShares(
         uint256 tokenId,

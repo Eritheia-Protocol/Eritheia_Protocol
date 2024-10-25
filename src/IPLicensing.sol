@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-//import "./IPManagement.sol";
+import "./IPManagement.sol";
 
 contract Licensing {
-    //CreateIPNFT public _createIPNFT;
+    CreateIPNFT public _createIPNFT;
     struct License {
-        address licensee;
+        address owner;
         uint256 startTime;
         uint256 endTime;
         uint256 royaltyPercentage;
@@ -17,26 +17,34 @@ contract Licensing {
 
     event LicenseIssued(
         uint256 indexed tokenId,
-        address indexed licensee,
+        address indexed owner,
         uint256 startTime,
         uint256 endTime,
         uint256 royaltyPercentage
     );
 
+    constructor(address createIPNFT) {
+        _createIPNFT = CreateIPNFT(createIPNFT);
+    }
+
     function issueLicense(
         uint256 tokenId,
-        address _licensee,
-        uint256 _startTime,
         uint256 _endTime,
         uint256 _royaltyPercentage
     ) public {
-        //uint256 _startTime = block.timestamp;
+        require(
+            _createIPNFT.ownerOf(tokenId) == msg.sender,
+            "Only Owner is allowed to license his/her own IP"
+        );
+
+        address _owner = msg.sender;
+        uint256 _startTime = block.timestamp;
 
         require(_royaltyPercentage <= 100, "Invalid royalty percentage");
         require(_startTime < _endTime, "Invalid time range");
 
         licenses[tokenId] = License(
-            _licensee,
+            _owner,
             _startTime,
             _endTime,
             _royaltyPercentage
@@ -44,7 +52,7 @@ contract Licensing {
 
         emit LicenseIssued(
             tokenId,
-            _licensee,
+            _owner,
             _startTime,
             _endTime,
             _royaltyPercentage

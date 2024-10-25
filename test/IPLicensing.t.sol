@@ -3,30 +3,32 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../src/IPLicensing.sol";
-
-//import "../src/IPManagement.sol";
+import "../src/IPManagement.sol";
 
 contract LicensingTest is Test {
+    CreateIPNFT public _createIPNFT;
     Licensing license;
-    uint256 tokenId = 1;
-    address licensee = address(0x123);
+
+    address owner;
+    address recepient = address(0x123);
 
     function setUp() public {
-        license = new Licensing();
+        owner = address(this);
+        _createIPNFT = new CreateIPNFT();
+        license = new Licensing(address(_createIPNFT));
     }
 
     function testIssueLicense() public {
-        uint256 startTime = block.timestamp;
+        vm.prank(owner);
+        string memory title = "Artwork";
+        string memory uri = "https://ipfs.io/ipfs/metadata";
+        uint256 tokenId = _createIPNFT.mintCreativeWork(recepient, title, uri);
+
+        vm.prank(recepient);
         uint256 endTime = block.timestamp + 1 days;
         uint256 royaltyPercentage = 10;
 
-        license.issueLicense(
-            tokenId,
-            licensee,
-            startTime,
-            endTime,
-            royaltyPercentage
-        );
+        license.issueLicense(tokenId, endTime, royaltyPercentage);
 
         bool validLicense = license.validLicense(tokenId);
 
